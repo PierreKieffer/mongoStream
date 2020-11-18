@@ -4,7 +4,7 @@
   <img src="logo.png">
 </p>
 
-mongoStream is a simple mongodb streaming service implemented in go based on mongodb change streams feature. 
+mongoStream is a mongodb streaming service based on mongodb change streams feature. 
 
 The service allows to launch asynchronous streams in parallel.  
 
