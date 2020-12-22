@@ -25,19 +25,45 @@ func ExtractOplogUpdatedFields(oplogUpdatedFields map[string]interface{}) []stri
 	return RemoveDuplicates(updatedFields)
 }
 
-func ExtractSubFields(inputMap map[string]interface{}, updatedFields *[]string, parentKey string) {
+func ExtractSubFields(ignoreKeys []string, inputMap map[string]interface{}, updatedFields *[]string, parentKey string) {
+
 	for k, v := range inputMap {
-		var subKey string
-		if parentKey == "" {
-			subKey = strings.Split(k, ".")[0]
-		} else {
-			subKey = parentKey + "." + strings.Split(k, ".")[0]
+
+		var toIgnore bool
+		for _, ignoreKey := range ignoreKeys {
+			matchIgnore, _ := regexp.MatchString(ignoreKey, k)
+			if matchIgnore {
+				toIgnore = true
+			}
 		}
-		if reflect.TypeOf(v).Kind() == reflect.Map {
-			ExtractSubFields(v.(map[string]interface{}), updatedFields, subKey)
-		} else {
-			*updatedFields = append(*updatedFields, subKey)
+
+		if !toIgnore {
+			var subKey string
+			if parentKey == "" {
+				for _, sk := range strings.Split(k, ".") {
+					_, e := strconv.Atoi(sk)
+					if e != nil {
+						if len(subKey) > 0 {
+							subKey = subKey + "." + sk
+						} else {
+							subKey = sk
+						}
+					}
+				}
+				// subKey = strings.Split(k, ".")[0]
+			} else {
+				subKey = parentKey + "." + strings.Split(k, ".")[0]
+			}
+			if v != nil {
+				if reflect.TypeOf(v).Kind() == reflect.Map {
+					ExtractSubFields(ignoreKeys, v.(map[string]interface{}), updatedFields, subKey)
+				} else {
+					*updatedFields = append(*updatedFields, subKey)
+				}
+			}
+
 		}
+
 	}
 
 }
