@@ -26,7 +26,6 @@ func InitBuffer(bufferSize int) chan dataModel.Oplog {
 
 func ListenerWorker(mongoUri string, database string, collection string, buffer chan dataModel.Oplog, csoOptional ...*options.ChangeStreamOptions) {
 
-	log.Println("Starting mongoStream on : " + mongoUri)
 	log.Println("Listening on database : " + database + "| collection : " + collection)
 
 	var cso *options.ChangeStreamOptions
